@@ -1,0 +1,48 @@
+This program encodes numeric data using the ABA standard, typically found on
+track 2 of magnetic stripe cards.
+For more details, see:
+http://en.wikipedia.org/wiki/Magnetic_stripe_card
+
+If interest exists, I can add support for IATA.
+
+
+Requirements:
+ - glib-2.0
+
+To build, simply type "make".
+
+The program takes two command line arguments:
+ms_enc <data> [output file]
+
+The "output file" is the name of the output file to save the PCM data.  If no
+output file is specified, then no data will be saved.
+The content is the numeric content to be encoded.
+
+
+What content can I encode?
+For full details, search Google, but I'll provide a very quick overview.
+
+Only numeric content can be encoded, plus a few instruction characters.
+Typically, you will stick to numbers and the instruction characters indicating
+the beginning and end of the data, and a field separator.
+
+To follow the standard specifically, the data would be as follows:
+
+<SS><ACCOUNT NUM><FS><EXP><DATA><ES>
+
+SS - Start sentinel, indicating beginning of data.  ASCII character ';'
+ACCOUNT NUM - Account number of variable length no longer than 19 numeric digits
+FS - Field seperator, indicating the end of the account number
+EXP - Four digit expiration date of the format YYMM
+DATA - Mmisc data (there is a standard, but I don't recall it entirely)
+ES - End sentinel, indicating end of data.  ASCII character '?'
+LRC - Checksum character, which will be calculated from the rest of the content
+
+The program will warn you if there is no start or end sentinel.
+No other checks are performed to see if you're providing valid data.
+
+
+What format is the data encoded in?
+If you specify an output file, data is saved as a raw PCM stream.
+The format is S16 LE.  As time is a very relative aspect, there is no set
+sample rate.  However, 48khz would work.
